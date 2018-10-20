@@ -1,8 +1,8 @@
 #!/usr/bin/python
 """DNS dinamico con TopHost.
 Lancia thdns -h per informazioni sull'uso.
-http://www.mythsmith.it
 Daniele Paganelli @ 2007
+Guido del Puente @ 2018 fix
 CreativeCommons Attribution-ShareAlike"""
 ########################
 # CONFIGURAZIONE
@@ -33,7 +33,6 @@ ip=''
 
 help="""#################################
 thdns %s - Gestione DNS per TopHost
-http://www.mythsmith.it
 #################################
 
 Utilizzo: thdns [<opzioni> <ip>]
@@ -57,7 +56,7 @@ Esempi:
 	thdns -> ottiene l'indirizzo dalla rete; se non corrisponde a %s, aggiorna (equivalente a thdns -g)
 """ % (version,logip,logip,logip)
 
-ua='User-Agent','thdns/%s (+http://daniele.modena1.it/code/thdns/view)' % version
+ua='User-Agent','thdns/%s (+https://github.com/gdelpuente/thdns)' % version
 
 #######################
 # FUNZIONI
@@ -72,7 +71,6 @@ from sys import argv,exit
 from os.path import exists
 from getopt import getopt
 import ssl
-import logging
 
 def getip():
 	"""Ottieni l'ip da checkip.dyndns.org"""
@@ -101,26 +99,11 @@ def getsid():
 	bound='<input type="hidden" name="sid" value="'
 	s=page.find(bound); e=page.find('">',s)
 	sid=page[s+len(bound):e]
-	# urlCP=page.find("<form action=\"")
-	# logging.warning(urlCP)
 	conn.close()
 	return sid,psi
 
 def dnscp(act,params):
 	"""Effettua l'azione richiesta sul pannello dns"""
-	# conn=HTTPSConnection('ns1.th.seeweb.it', timeout=100, context=ssl._create_unverified_context())
-	# conn.putrequest('POST', act)
-	# conn.putheader('Host', 'ns1.th.seeweb.it')
-	# conn.putheader('Connection', 'keep-alive')
-	# conn.putheader("Content-length", "%d" % len(params))
-	# conn.putheader("Origin", "https://cp.tophost.it")
-	# conn.putheader("Content-type", "application/x-www-form-urlencoded")
-	# conn.putheader(ua[0],ua[1])
-	# conn.putheader("Referer", "ttps://cp.tophost.it/dnsjump.php")
-	# conn.putheader('Cookie', 'seeweb='+psi )
-	#
-	# conn.endheaders()
-	# conn.send(params)
 	headers = {"Content-type": "application/x-www-form-urlencoded","Accept": "text/plain", "Cookie":"seeweb="+psi,"Content-length":"%d" % len(params)}
 	conn = HTTPSConnection("ns1.th.seeweb.it", timeout=100, context=ssl._create_unverified_context())
 	conn.request("POST", act, params, headers)
@@ -129,11 +112,6 @@ def dnscp(act,params):
 	hdrs = response.getheaders()
 	msg = response.msg
 	reply = response.status
-	# logging.warning("params: "+ params)
-	# logging.warning("act: "+ act)
-	# logging.warning("psi: "+ psi)
-	# logging.warning(reply)
-	# reply, msg, hdrs = conn.getreply()
 	page = response.read()
 	conn.close()
 	return reply,msg,hdrs,page
