@@ -14,7 +14,7 @@ passwd = "passwd"
 dyn=['@','www']
 ```
 ```
-https://github.com/gdelpuente/thdns
+git clone https://github.com/gdelpuente/thdns
 cd thdns
 python thdns.py -g
 ```
